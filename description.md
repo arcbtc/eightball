@@ -1,10 +1,5 @@
-MyExtension can be used as a template for building new extensions, it includes a bunch of functions that can be edited/deleted as you need them.
+make payment qr codes that people can pay some sats to an receive a random word from a list.
 
-This is a longform description that will be used in the advanced description when users click on the "more" button on the extension cards.
-
-Adding some bullets is nice covering:
-
-* Functionality
-* Use cases
-
-...and some other text about just how great this etension is.
+Example use cases:
+* Magic eightball
+* Pay for satoshi quotes

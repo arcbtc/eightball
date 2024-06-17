@@ -3,98 +3,83 @@ from typing import List, Optional, Union
 from lnbits.helpers import urlsafe_short_hash
 from lnbits.lnurl import encode as lnurl_encode
 from . import db
-from .models import CreateMyExtensionData, MyExtension
+from .models import CreateEightBallData, EightBall
 from loguru import logger
 from fastapi import Request
 from lnurl import encode as lnurl_encode
 import shortuuid
 
 
-async def create_myextension(
-    wallet_id: str, data: CreateMyExtensionData, req: Request
-) -> MyExtension:
-    myextension_id = urlsafe_short_hash()
+async def create_eightballl(
+    wallet_id: str, data: CreateEightBallData, req: Request
+) -> EightBall:
+    eightballl_id = urlsafe_short_hash()
     await db.execute(
         """
-        INSERT INTO myextension.maintable (id, wallet, name, lnurlpayamount, lnurlwithdrawamount)
+        INSERT INTO eightballl.maintable (id, wallet, name, lnurlpayamount, wordlist)
         VALUES (?, ?, ?, ?, ?)
         """,
         (
-            myextension_id,
+            eightballl_id,
             wallet_id,
             data.name,
             data.lnurlpayamount,
-            data.lnurlwithdrawamount,
+            data.wordlist,
         ),
     )
-    myextension = await get_myextension(myextension_id, req)
-    assert myextension, "Newly created table couldn't be retrieved"
-    return myextension
+    eightballl = await get_eightballl(eightballl_id, req)
+    assert eightballl, "Newly created table couldn't be retrieved"
+    return eightballl
 
-
-async def get_myextension(
-    myextension_id: str, req: Optional[Request] = None
-) -> Optional[MyExtension]:
+async def get_eightballl(
+    eightballl_id: str, req: Optional[Request] = None
+) -> Optional[EightBall]:
     row = await db.fetchone(
-        "SELECT * FROM myextension.maintable WHERE id = ?", (myextension_id,)
+        "SELECT * FROM eightballl.maintable WHERE id = ?", (eightballl_id,)
     )
     if not row:
         return None
-    rowAmended = MyExtension(**row)
+    rowAmended = EightBall(**row)
     if req:
         rowAmended.lnurlpay = lnurl_encode(
-            req.url_for("myextension.api_lnurl_pay", myextension_id=row.id)._url
-        )
-        rowAmended.lnurlwithdraw = lnurl_encode(
-            req.url_for(
-                "myextension.api_lnurl_withdraw",
-                myextension_id=row.id,
-                tickerhash=shortuuid.uuid(name=rowAmended.id + str(rowAmended.ticker)),
-            )._url
+            req.url_for("eightballl.api_lnurl_pay", eightballl_id=row.id)._url
         )
     return rowAmended
 
 
-async def get_myextensions(
+async def get_eightballls(
     wallet_ids: Union[str, List[str]], req: Optional[Request] = None
-) -> List[MyExtension]:
+) -> List[EightBall]:
     if isinstance(wallet_ids, str):
         wallet_ids = [wallet_ids]
 
     q = ",".join(["?"] * len(wallet_ids))
     rows = await db.fetchall(
-        f"SELECT * FROM myextension.maintable WHERE wallet IN ({q})", (*wallet_ids,)
+        f"SELECT * FROM eightballl.maintable WHERE wallet IN ({q})", (*wallet_ids,)
     )
-    tempRows = [MyExtension(**row) for row in rows]
+    tempRows = [EightBall(**row) for row in rows]
     if req:
         for row in tempRows:
             row.lnurlpay = lnurl_encode(
-                req.url_for("myextension.api_lnurl_pay", myextension_id=row.id)._url
-            )
-            row.lnurlwithdraw = lnurl_encode(
-                req.url_for(
-                    "myextension.api_lnurl_withdraw",
-                    myextension_id=row.id,
-                    tickerhash=shortuuid.uuid(name=row.id + str(row.ticker)),
-                )._url
+                req.url_for("eightballl.api_lnurl_pay", eightballl_id=row.id)._url
             )
     return tempRows
 
 
-async def update_myextension(
-    myextension_id: str, req: Optional[Request] = None, **kwargs
-) -> MyExtension:
+async def update_eightballl(
+    eightballl_id: str, req: Optional[Request] = None, **kwargs
+) -> EightBall:
     q = ", ".join([f"{field[0]} = ?" for field in kwargs.items()])
     await db.execute(
-        f"UPDATE myextension.maintable SET {q} WHERE id = ?",
-        (*kwargs.values(), myextension_id),
+        f"UPDATE eightballl.maintable SET {q} WHERE id = ?",
+        (*kwargs.values(), eightballl_id),
     )
-    myextension = await get_myextension(myextension_id, req)
-    assert myextension, "Newly updated myextension couldn't be retrieved"
-    return myextension
+    eightballl = await get_eightballl(eightballl_id, req)
+    assert eightballl, "Newly updated eightballl couldn't be retrieved"
+    return eightballl
 
 
-async def delete_myextension(myextension_id: str) -> None:
+async def delete_eightballl(eightballl_id: str) -> None:
     await db.execute(
-        "DELETE FROM myextension.maintable WHERE id = ?", (myextension_id,)
+        "DELETE FROM eightballl.maintable WHERE id = ?", (eightballl_id,)
     )

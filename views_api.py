@@ -19,15 +19,15 @@ from lnbits.decorators import (
     require_invoice_key,
 )
 
-from . import myextension_ext
+from . import eightballl_ext
 from .crud import (
-    create_myextension,
-    update_myextension,
-    delete_myextension,
-    get_myextension,
-    get_myextensions,
+    create_eightballl,
+    update_eightballl,
+    delete_eightballl,
+    get_eightballl,
+    get_eightballls,
 )
-from .models import CreateMyExtensionData
+from .models import CreateEightBallData
 
 
 #######################################
@@ -37,8 +37,8 @@ from .models import CreateMyExtensionData
 ## Get all the records belonging to the user
 
 
-@myextension_ext.get("/api/v1/myex", status_code=HTTPStatus.OK)
-async def api_myextensions(
+@eightballl_ext.get("/api/v1/eightb", status_code=HTTPStatus.OK)
+async def api_eightballls(
     req: Request,
     all_wallets: bool = Query(False),
     wallet: WalletTypeInfo = Depends(get_key_type),
@@ -48,121 +48,85 @@ async def api_myextensions(
         user = await get_user(wallet.wallet.user)
         wallet_ids = user.wallet_ids if user else []
     return [
-        myextension.dict() for myextension in await get_myextensions(wallet_ids, req)
+        eightballl.dict() for eightballl in await get_eightballls(wallet_ids, req)
     ]
 
 
 ## Get a single record
 
 
-@myextension_ext.get("/api/v1/myex/{myextension_id}", status_code=HTTPStatus.OK)
-async def api_myextension(
-    req: Request, myextension_id: str, WalletTypeInfo=Depends(get_key_type)
+@eightballl_ext.get("/api/v1/eightb/{eightballl_id}", status_code=HTTPStatus.OK)
+async def api_eightballl(
+    req: Request, eightballl_id: str, WalletTypeInfo=Depends(get_key_type)
 ):
-    myextension = await get_myextension(myextension_id, req)
-    if not myextension:
+    eightballl = await get_eightballl(eightballl_id, req)
+    if not eightballl:
         raise HTTPException(
-            status_code=HTTPStatus.NOT_FOUND, detail="MyExtension does not exist."
+            status_code=HTTPStatus.NOT_FOUND, detail="EightBall does not exist."
         )
-    return myextension.dict()
+    return eightballl.dict()
 
 
 ## update a record
 
 
-@myextension_ext.put("/api/v1/myex/{myextension_id}")
-async def api_myextension_update(
+@eightballl_ext.put("/api/v1/eightb/{eightballl_id}")
+async def api_eightballl_update(
     req: Request,
-    data: CreateMyExtensionData,
-    myextension_id: str,
+    data: CreateEightBallData,
+    eightballl_id: str,
     wallet: WalletTypeInfo = Depends(get_key_type),
 ):
-    if not myextension_id:
+    if not eightballl_id:
         raise HTTPException(
-            status_code=HTTPStatus.NOT_FOUND, detail="MyExtension does not exist."
+            status_code=HTTPStatus.NOT_FOUND, detail="EightBall does not exist."
         )
-    myextension = await get_myextension(myextension_id, req)
-    assert myextension, "MyExtension couldn't be retrieved"
+    eightballl = await get_eightballl(eightballl_id, req)
+    assert eightballl, "EightBall couldn't be retrieved"
 
-    if wallet.wallet.id != myextension.wallet:
+    if wallet.wallet.id != eightballl.wallet:
         raise HTTPException(
-            status_code=HTTPStatus.FORBIDDEN, detail="Not your MyExtension."
+            status_code=HTTPStatus.FORBIDDEN, detail="Not your EightBall."
         )
-    myextension = await update_myextension(
-        myextension_id=myextension_id, **data.dict(), req=req
+    eightballl = await update_eightballl(
+        eightballl_id=eightballl_id, **data.dict(), req=req
     )
-    return myextension.dict()
+    return eightballl.dict()
 
 
 ## Create a new record
 
 
-@myextension_ext.post("/api/v1/myex", status_code=HTTPStatus.CREATED)
-async def api_myextension_create(
+@eightballl_ext.post("/api/v1/eightb", status_code=HTTPStatus.CREATED)
+async def api_eightballl_create(
     req: Request,
-    data: CreateMyExtensionData,
+    data: CreateEightBallData,
     wallet: WalletTypeInfo = Depends(require_admin_key),
 ):
-    myextension = await create_myextension(
+    eightballl = await create_eightballl(
         wallet_id=wallet.wallet.id, data=data, req=req
     )
-    return myextension.dict()
+    return eightballl.dict()
 
 
 ## Delete a record
 
 
-@myextension_ext.delete("/api/v1/myex/{myextension_id}")
-async def api_myextension_delete(
-    myextension_id: str, wallet: WalletTypeInfo = Depends(require_admin_key)
+@eightballl_ext.delete("/api/v1/eightb/{eightballl_id}")
+async def api_eightballl_delete(
+    eightballl_id: str, wallet: WalletTypeInfo = Depends(require_admin_key)
 ):
-    myextension = await get_myextension(myextension_id)
+    eightballl = await get_eightballl(eightballl_id)
 
-    if not myextension:
+    if not eightballl:
         raise HTTPException(
-            status_code=HTTPStatus.NOT_FOUND, detail="MyExtension does not exist."
+            status_code=HTTPStatus.NOT_FOUND, detail="EightBall does not exist."
         )
 
-    if myextension.wallet != wallet.wallet.id:
+    if eightballl.wallet != wallet.wallet.id:
         raise HTTPException(
-            status_code=HTTPStatus.FORBIDDEN, detail="Not your MyExtension."
+            status_code=HTTPStatus.FORBIDDEN, detail="Not your EightBall."
         )
 
-    await delete_myextension(myextension_id)
+    await delete_eightballl(eightballl_id)
     return "", HTTPStatus.NO_CONTENT
-
-
-# ANY OTHER ENDPOINTS YOU NEED
-
-## This endpoint creates a payment
-
-
-@myextension_ext.post(
-    "/api/v1/myex/payment/{myextension_id}", status_code=HTTPStatus.CREATED
-)
-async def api_tpos_create_invoice(
-    myextension_id: str, amount: int = Query(..., ge=1), memo: str = ""
-) -> dict:
-    myextension = await get_myextension(myextension_id)
-
-    if not myextension:
-        raise HTTPException(
-            status_code=HTTPStatus.NOT_FOUND, detail="MyExtension does not exist."
-        )
-
-    # we create a payment and add some tags, so tasks.py can grab the payment once its paid
-
-    try:
-        payment_hash, payment_request = await create_invoice(
-            wallet_id=myextension.wallet,
-            amount=amount,
-            memo=f"{memo} to {myextension.name}" if memo else f"{myextension.name}",
-            extra={
-                "tag": "myextension",
-                "amount": amount,
-            },
-        )
-    except Exception as e:
-        raise HTTPException(status_code=HTTPStatus.INTERNAL_SERVER_ERROR, detail=str(e))
-
-    return {"payment_hash": payment_hash, "payment_request": payment_request}
