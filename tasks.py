@@ -7,7 +7,7 @@ from lnbits.core.services import create_invoice, websocket_updater
 from lnbits.helpers import get_current_extension_name
 from lnbits.tasks import register_invoice_listener
 
-from .crud import get_eightballl, update_eightballl
+from .crud import get_eightball, update_eightball
 
 
 #######################################
@@ -32,8 +32,8 @@ async def on_invoice_paid(payment: Payment) -> None:
     if payment.extra.get("tag") != "EightBall":
         return
 
-    eightballl_id = payment.extra.get("eightballlId")
-    eightball = await get_eightballl(eightballl_id)
+    eightball_id = payment.extra.get("eightballId")
+    eightball = await get_eightball(eightball_id)
 
     # update something in the db
     if payment.extra.get("lnurlwithdraw"):
@@ -42,9 +42,9 @@ async def on_invoice_paid(payment: Payment) -> None:
         total = eightball.total + payment.amount
     data_to_update = {"total": total}
 
-    await update_eightballl(eightballl_id=eightballl_id, **data_to_update)
+    await update_eightball(eightball_id=eightball_id, **data_to_update)
 
-    # here we could send some data to a websocket on wss://<your-lnbits>/api/v1/ws/<eightballl_id>
+    # here we could send some data to a websocket on wss://<your-lnbits>/api/v1/ws/<eightball_id>
     # and then listen to it on the frontend, which we do with index.html connectWebocket()
 
     some_payment_data = {
@@ -54,4 +54,4 @@ async def on_invoice_paid(payment: Payment) -> None:
         "checking_id": payment.checking_id,
     }
 
-    await websocket_updater(eightballl_id, str(some_payment_data))
+    await websocket_updater(eightball_id, str(some_payment_data))
