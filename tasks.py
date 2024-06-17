@@ -35,22 +35,10 @@ async def on_invoice_paid(payment: Payment) -> None:
     eightball_id = payment.extra.get("eightballId")
     eightball = await get_eightball(eightball_id)
 
-    # update something in the db
-    if payment.extra.get("lnurlwithdraw"):
-        total = eightball.total - payment.amount
-    else:
-        total = eightball.total + payment.amount
-    data_to_update = {"total": total}
-
-    await update_eightball(eightball_id=eightball_id, **data_to_update)
-
-    # here we could send some data to a websocket on wss://<your-lnbits>/api/v1/ws/<eightball_id>
-    # and then listen to it on the frontend, which we do with index.html connectWebocket()
 
     some_payment_data = {
         "name": eightball.name,
         "amount": payment.amount,
-        "fee": payment.fee,
         "checking_id": payment.checking_id,
     }
 

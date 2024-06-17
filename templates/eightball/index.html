@@ -95,14 +95,14 @@
           placeholder="Name for your record"></q-input>
         <q-select filled dense emit-value v-model="formDialog.data.wallet" :options="g.user.walletOptions"
           label="Wallet *"></q-select>
-        <q-input filled dense type="number" v-model.trim="formDialog.data.lnurlwithdrawamount"
-          label="LNURL-withdraw amount"></q-input>
         <q-input filled dense type="number" v-model.trim="formDialog.data.lnurlpayamount"
           label="LNURL-pay amount"></q-input>
+          <q-input filled dense type="textarea" v-model.trim="formDialog.data.wordlist"
+          label="LNURL-withdraw amount"></q-input>
         <div class="row q-mt-lg">
           <q-btn v-if="formDialog.data.id" unelevated color="primary" type="submit">Update EightBall</q-btn>
           <q-btn v-else unelevated color="primary"
-            :disable="formDialog.data.name == null || formDialog.data.wallet == null || formDialog.data.lnurlwithdrawamount == null || formDialog.data.lnurlpayamount == null"
+            :disable="formDialog.data.name == null || formDialog.data.wallet == null || formDialog.data.wordlist == null || formDialog.data.lnurlpayamount == null"
             type="submit">Create EightBall</q-btn>
           <q-btn v-close-popup flat color="grey" class="q-ml-auto">Cancel</q-btn>
         </div>
@@ -124,27 +124,6 @@
 
       <q-separator></q-separator>
 
-      <div class="row justify-start q-mt-lg">
-        <div class="col col-md-auto">
-          <q-btn outline style="color: primmary;" @click="qrValue = urlDialog.data.lnurlpay">lnurlpay</q-btn>
-
-        </div>
-        <div class="col col-md-auto">
-          <q-btn outline style="color: primmary;" @click="qrValue = urlDialog.data.lnurlwithdraw">lnurlwithdraw</q-btn>
-
-        </div>
-        <div class="col q-pl-md">
-          <q-input filled bottom-slots dense v-model="invoiceAmount">
-            <template v-slot:append>
-              <q-btn round @click="createInvoice(urlDialog.data.wallet, urlDialog.data.id)" color="primary" flat
-                icon="add_circle" />
-            </template>
-            <template v-slot:hint>
-              Create an invoice
-            </template>
-          </q-input>
-        </div>
-      </div>
       <div class="row q-mt-lg">
         <q-btn v-close-popup flat color="grey" class="q-ml-auto">Close</q-btn>
       </div>
@@ -186,7 +165,6 @@
               label: 'Wallet',
               field: 'wallet'
             },
-            { name: 'total', align: 'left', label: 'Total sent/received', field: 'total' },
           ],
           pagination: {
             rowsPerPage: 10
@@ -194,7 +172,9 @@
         },
         formDialog: {
           show: false,
-          data: {},
+          data: {
+            wordlist: "yes\nno\nmaybe\nask again later\nbetter not tell you now\ncannot predict now\nconcentrate and ask again\nmy reply is no\nmy sources say no\noutlook not so good\nvery doubtful",
+          },
           advanced: {}
         },
         urlDialog: {
@@ -231,7 +211,7 @@
       sendEightBallData() {
         const data = {
           name: this.formDialog.data.name,
-          lnurlwithdrawamount: this.formDialog.data.lnurlwithdrawamount,
+          wordlist: this.formDialog.data.wordlist,
           lnurlpayamount: this.formDialog.data.lnurlpayamount
         }
         const wallet = _.findWhere(this.g.user.wallets, {
@@ -250,12 +230,6 @@
         const eightball = _.findWhere(this.eightb, { id: tempId })
         this.formDialog.data = {
           ...eightball
-        }
-        if (this.formDialog.data.tip_wallet != '') {
-          this.formDialog.advanced.tips = true
-        }
-        if (this.formDialog.data.withdrawlimit >= 1) {
-          this.formDialog.advanced.otc = true
         }
         this.formDialog.show = true
       },

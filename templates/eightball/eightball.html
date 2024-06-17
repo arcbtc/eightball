@@ -24,14 +24,9 @@
   <div class="col-12 col-sm-6 col-md-5 col-lg-4 q-gutter-y-md">
     <q-card>
       <q-card-section>
-        <h6 class="text-subtitle1 q-mb-sm q-mt-none">Public page</h6>
+        <h6 class="text-subtitle1 q-mb-sm q-mt-none" >{% raw %} {{eightBallname}} {% endraw %}</h6>
         <p class="q-my-none">
-          Most extensions have a public page that can be shared
-          (this page will still be accessible even if you have restricted
-          access to your LNbits install).
-          <br /><br />
-          In this example when a user pays the LNURLpay it triggers an event via a websocket waiting for the payment, which you can subscribe to somewhere using wss://{your-lnbits}/api/v1/ws/{the-id-of-this-record}
-      </q-card-section>
+          Pay sats and get words back</q-card-section>
       <q-card-section class="q-pa-none">
         <q-separator></q-separator>
         <q-list> </q-list>
@@ -49,12 +44,13 @@
     data: function () {
       return {
         qrValue: '{{lnurlpay}}',
-        myExtensionID: '{{eightball_id}}'
+        eightBallID: '{{eightball_id}}',
+        eightBallname: '{{eightball_name}}',
       }
     },
     created: function () {
       // Will trigger payment reaction when payment received, sent from tasks.py
-      eventReactionWebocket(this.myExtensionID)
+      eventReactionWebocket(this.eightBallID)
     },
     methods: {
     }

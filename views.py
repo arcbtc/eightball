@@ -45,6 +45,7 @@ async def eightball(request: Request, eightball_id):
         {
             "request": request,
             "eightball_id": eightball_id,
+            "eightball_name": eightball.name,
             "lnurlpay": eightball.lnurlpay,
             "web_manifest": f"/eightball/manifest/{eightball_id}.webmanifest",
         },

@@ -12,6 +12,7 @@ from typing import Optional
 from .crud import update_eightball
 from .models import EightBall
 import shortuuid
+import random
 
 #################################################
 ########### A very simple LNURLpay ##############
@@ -71,8 +72,9 @@ async def api_lnurl_pay_cb(
             "extra": request.query_params.get("amount"),
         },
     )
+    randomWord = random.choice(eightball.wordlist.split("\n"))
     return {
         "pr": payment_request,
         "routes": [],
-        "successAction": {"tag": "message", "message": f"Paid {eightball.name}"},
+        "successAction": {"tag": "message", "message": randomWord},
     }
