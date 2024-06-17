@@ -48,7 +48,7 @@ async def api_eightballls(
         user = await get_user(wallet.wallet.user)
         wallet_ids = user.wallet_ids if user else []
     return [
-        eightballl.dict() for eightballl in await get_eightballls(wallet_ids, req)
+        eightball.dict() for eightball in await get_eightballls(wallet_ids, req)
     ]
 
 
@@ -59,12 +59,12 @@ async def api_eightballls(
 async def api_eightballl(
     req: Request, eightballl_id: str, WalletTypeInfo=Depends(get_key_type)
 ):
-    eightballl = await get_eightballl(eightballl_id, req)
-    if not eightballl:
+    eightball = await get_eightballl(eightballl_id, req)
+    if not eightball:
         raise HTTPException(
             status_code=HTTPStatus.NOT_FOUND, detail="EightBall does not exist."
         )
-    return eightballl.dict()
+    return eightball.dict()
 
 
 ## update a record
@@ -81,17 +81,17 @@ async def api_eightballl_update(
         raise HTTPException(
             status_code=HTTPStatus.NOT_FOUND, detail="EightBall does not exist."
         )
-    eightballl = await get_eightballl(eightballl_id, req)
-    assert eightballl, "EightBall couldn't be retrieved"
+    eightball = await get_eightballl(eightballl_id, req)
+    assert eightball, "EightBall couldn't be retrieved"
 
-    if wallet.wallet.id != eightballl.wallet:
+    if wallet.wallet.id != eightball.wallet:
         raise HTTPException(
             status_code=HTTPStatus.FORBIDDEN, detail="Not your EightBall."
         )
-    eightballl = await update_eightballl(
+    eightball = await update_eightballl(
         eightballl_id=eightballl_id, **data.dict(), req=req
     )
-    return eightballl.dict()
+    return eightball.dict()
 
 
 ## Create a new record
@@ -103,10 +103,10 @@ async def api_eightballl_create(
     data: CreateEightBallData,
     wallet: WalletTypeInfo = Depends(require_admin_key),
 ):
-    eightballl = await create_eightballl(
+    eightball = await create_eightballl(
         wallet_id=wallet.wallet.id, data=data, req=req
     )
-    return eightballl.dict()
+    return eightball.dict()
 
 
 ## Delete a record
@@ -116,14 +116,14 @@ async def api_eightballl_create(
 async def api_eightballl_delete(
     eightballl_id: str, wallet: WalletTypeInfo = Depends(require_admin_key)
 ):
-    eightballl = await get_eightballl(eightballl_id)
+    eightball = await get_eightballl(eightballl_id)
 
-    if not eightballl:
+    if not eightball:
         raise HTTPException(
             status_code=HTTPStatus.NOT_FOUND, detail="EightBall does not exist."
         )
 
-    if eightballl.wallet != wallet.wallet.id:
+    if eightball.wallet != wallet.wallet.id:
         raise HTTPException(
             status_code=HTTPStatus.FORBIDDEN, detail="Not your EightBall."
         )

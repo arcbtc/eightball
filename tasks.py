@@ -33,13 +33,13 @@ async def on_invoice_paid(payment: Payment) -> None:
         return
 
     eightballl_id = payment.extra.get("eightballlId")
-    eightballl = await get_eightballl(eightballl_id)
+    eightball = await get_eightballl(eightballl_id)
 
     # update something in the db
     if payment.extra.get("lnurlwithdraw"):
-        total = eightballl.total - payment.amount
+        total = eightball.total - payment.amount
     else:
-        total = eightballl.total + payment.amount
+        total = eightball.total + payment.amount
     data_to_update = {"total": total}
 
     await update_eightballl(eightballl_id=eightballl_id, **data_to_update)
@@ -48,7 +48,7 @@ async def on_invoice_paid(payment: Payment) -> None:
     # and then listen to it on the frontend, which we do with index.html connectWebocket()
 
     some_payment_data = {
-        "name": eightballl.name,
+        "name": eightball.name,
         "amount": payment.amount,
         "fee": payment.fee,
         "checking_id": payment.checking_id,

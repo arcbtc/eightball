@@ -16,7 +16,7 @@ async def create_eightballl(
     eightballl_id = urlsafe_short_hash()
     await db.execute(
         """
-        INSERT INTO eightballl.maintable (id, wallet, name, lnurlpayamount, wordlist)
+        INSERT INTO eightball.maintable (id, wallet, name, lnurlpayamount, wordlist)
         VALUES (?, ?, ?, ?, ?)
         """,
         (
@@ -27,22 +27,22 @@ async def create_eightballl(
             data.wordlist,
         ),
     )
-    eightballl = await get_eightballl(eightballl_id, req)
-    assert eightballl, "Newly created table couldn't be retrieved"
-    return eightballl
+    eightball = await get_eightballl(eightballl_id, req)
+    assert eightball, "Newly created table couldn't be retrieved"
+    return eightball
 
 async def get_eightballl(
     eightballl_id: str, req: Optional[Request] = None
 ) -> Optional[EightBall]:
     row = await db.fetchone(
-        "SELECT * FROM eightballl.maintable WHERE id = ?", (eightballl_id,)
+        "SELECT * FROM eightball.maintable WHERE id = ?", (eightballl_id,)
     )
     if not row:
         return None
     rowAmended = EightBall(**row)
     if req:
         rowAmended.lnurlpay = lnurl_encode(
-            req.url_for("eightballl.api_lnurl_pay", eightballl_id=row.id)._url
+            req.url_for("eightball.api_lnurl_pay", eightballl_id=row.id)._url
         )
     return rowAmended
 
@@ -55,13 +55,13 @@ async def get_eightballls(
 
     q = ",".join(["?"] * len(wallet_ids))
     rows = await db.fetchall(
-        f"SELECT * FROM eightballl.maintable WHERE wallet IN ({q})", (*wallet_ids,)
+        f"SELECT * FROM eightball.maintable WHERE wallet IN ({q})", (*wallet_ids,)
     )
     tempRows = [EightBall(**row) for row in rows]
     if req:
         for row in tempRows:
             row.lnurlpay = lnurl_encode(
-                req.url_for("eightballl.api_lnurl_pay", eightballl_id=row.id)._url
+                req.url_for("eightball.api_lnurl_pay", eightballl_id=row.id)._url
             )
     return tempRows
 
@@ -71,15 +71,15 @@ async def update_eightballl(
 ) -> EightBall:
     q = ", ".join([f"{field[0]} = ?" for field in kwargs.items()])
     await db.execute(
-        f"UPDATE eightballl.maintable SET {q} WHERE id = ?",
+        f"UPDATE eightball.maintable SET {q} WHERE id = ?",
         (*kwargs.values(), eightballl_id),
     )
-    eightballl = await get_eightballl(eightballl_id, req)
-    assert eightballl, "Newly updated eightballl couldn't be retrieved"
-    return eightballl
+    eightball = await get_eightballl(eightballl_id, req)
+    assert eightball, "Newly updated eightball couldn't be retrieved"
+    return eightball
 
 
 async def delete_eightballl(eightballl_id: str) -> None:
     await db.execute(
-        "DELETE FROM eightballl.maintable WHERE id = ?", (eightballl_id,)
+        "DELETE FROM eightball.maintable WHERE id = ?", (eightballl_id,)
     )

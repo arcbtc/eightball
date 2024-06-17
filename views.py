@@ -26,7 +26,7 @@ eightb = Jinja2Templates(directory="eightb")
 @eightballl_ext.get("/", response_class=HTMLResponse)
 async def index(request: Request, user: User = Depends(check_user_exists)):
     return eightballl_renderer().TemplateResponse(
-        "eightballl/index.html", {"request": request, "user": user.dict()}
+        "eightball/index.html", {"request": request, "user": user.dict()}
     )
 
 
@@ -34,19 +34,19 @@ async def index(request: Request, user: User = Depends(check_user_exists)):
 
 
 @eightballl_ext.get("/{eightballl_id}")
-async def eightballl(request: Request, eightballl_id):
-    eightballl = await get_eightballl(eightballl_id, request)
-    if not eightballl:
+async def eightball(request: Request, eightballl_id):
+    eightball = await get_eightballl(eightballl_id, request)
+    if not eightball:
         raise HTTPException(
             status_code=HTTPStatus.NOT_FOUND, detail="EightBall does not exist."
         )
     return eightballl_renderer().TemplateResponse(
-        "eightballl/eightballl.html",
+        "eightball/eightball.html",
         {
             "request": request,
             "eightballl_id": eightballl_id,
-            "lnurlpay": eightballl.lnurlpay,
-            "web_manifest": f"/eightballl/manifest/{eightballl_id}.webmanifest",
+            "lnurlpay": eightball.lnurlpay,
+            "web_manifest": f"/eightball/manifest/{eightballl_id}.webmanifest",
         },
     )
 
@@ -56,15 +56,15 @@ async def eightballl(request: Request, eightballl_id):
 
 @eightballl_ext.get("/manifest/{eightballl_id}.webmanifest")
 async def manifest(eightballl_id: str):
-    eightballl = await get_eightballl(eightballl_id)
-    if not eightballl:
+    eightball = await get_eightballl(eightballl_id)
+    if not eightball:
         raise HTTPException(
             status_code=HTTPStatus.NOT_FOUND, detail="EightBall does not exist."
         )
 
     return {
         "short_name": settings.lnbits_site_title,
-        "name": eightballl.name + " - " + settings.lnbits_site_title,
+        "name": eightball.name + " - " + settings.lnbits_site_title,
         "icons": [
             {
                 "src": settings.lnbits_custom_logo
@@ -74,18 +74,18 @@ async def manifest(eightballl_id: str):
                 "sizes": "900x900",
             }
         ],
-        "start_url": "/eightballl/" + eightballl_id,
+        "start_url": "/eightball/" + eightballl_id,
         "background_color": "#1F2234",
         "description": "Minimal extension to build on",
         "display": "standalone",
-        "scope": "/eightballl/" + eightballl_id,
+        "scope": "/eightball/" + eightballl_id,
         "theme_color": "#1F2234",
         "shortcuts": [
             {
-                "name": eightballl.name + " - " + settings.lnbits_site_title,
-                "short_name": eightballl.name,
-                "description": eightballl.name + " - " + settings.lnbits_site_title,
-                "url": "/eightballl/" + eightballl_id,
+                "name": eightball.name + " - " + settings.lnbits_site_title,
+                "short_name": eightball.name,
+                "description": eightball.name + " - " + settings.lnbits_site_title,
+                "url": "/eightball/" + eightballl_id,
             }
         ],
     }
